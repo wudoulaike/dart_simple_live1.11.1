@@ -18,14 +18,19 @@ jobs:
       - name: Flutter doctor
         run: flutter doctor -v
 
-      - name: 关闭AGP新DSL，注释release signingConfig行
+      - name: 关闭AGP新DSL，生成临时keystore.properties，注释release签名引用
         run: |
           cd simple_live_app/android
           echo "android.newDsl=false" >> gradle.properties
           echo "android.builtInKotlin=false" >> gradle.properties
-          # 找到包含 signingConfig = signingConfigs.getByName("release") 的行，在行首添加 //
+          cat > keystore.properties <<'EOF'
+keyAlias=temp
+keyPassword=temp123
+storeFile=temp.keystore
+storePassword=temp123
+EOF
+          # 注释引用行
           sed -i 's/\(.*signingConfig = signingConfigs.getByName("release")\)/\/\/ \1/' app/build.gradle.kts
-          cat app/build.gradle.kts
 
       - name: Fetch dependencies
         run: |
