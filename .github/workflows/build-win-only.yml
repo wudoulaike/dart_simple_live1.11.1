@@ -1,6 +1,6 @@
 name: Build Windows Only
 on:
-  workflow_dispatch: # ✅ 支持手动点击Run workflow启动
+  workflow_dispatch: # 支持手动点击Run workflow启动
 
 jobs:
   build-windows:
@@ -12,7 +12,7 @@ jobs:
       - name: Setup Flutter
         uses: subosito/flutter-action@v2
         with:
-          flutter-version: '3.22.0'
+          flutter-version: '3.32.0'
           channel: stable
 
       - name: Flutter Doctor
