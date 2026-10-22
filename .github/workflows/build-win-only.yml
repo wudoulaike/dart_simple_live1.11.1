@@ -5,6 +5,9 @@ on:
 jobs:
   build-windows:
     runs-on: windows-latest
+    env:
+      CXXFLAGS: -D_SILENCE_EXPERIMENTAL_COROUTINE_DEPRECATION_WARNINGS
+      CFLAGS: -D_SILENCE_EXPERIMENTAL_COROUTINE_DEPRECATION_WARNINGS
     steps:
       - name: Checkout source
         uses: actions/checkout@v4
