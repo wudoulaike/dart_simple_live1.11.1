@@ -40,6 +40,15 @@ jobs:
           cd simple_live_app
           flutter pub get
 
+      # ========== 重点：patch auto_orientation_v2 插件的build.gradle ==========
+      - name: Patch auto_orientation_v2 fix jvmTarget
+        run: |
+          cd simple_live_app
+          FILE=$(find ~/.pub-cache/hosted/pub.dev/auto_orientation_v2-2.4.7/android/build.gradle)
+          echo "Patching $FILE"
+          # 把 jvmTarget = "1.8" 替换成新版本枚举写法
+          sed -i 's/jvmTarget = "1.8"/jvmTarget = org.jetbrains.kotlin.gradle.dsl.JvmTarget.JVM_18/g' "$FILE"
+
       - name: Build Release APK
         run: |
           cd simple_live_app
