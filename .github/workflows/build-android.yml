@@ -18,24 +18,34 @@ jobs:
       - name: Flutter doctor
         run: flutter doctor -v
 
-      - name: 关闭新DSL
+      - name: 准备临时签名配置
         run: |
           cd simple_live_app/android
           echo "android.newDsl=false" >> gradle.properties
           echo "android.builtInKotlin=false" >> gradle.properties
+          cat > app/keystore.properties <<EOF
+keyAlias=temp
+keyPassword=temp123
+storeFile=temp.keystore
+storePassword=temp123
+EOF
+
+      - name: 修复gradle.kts类型转换（核心！）
+        run: |
+          cd simple_live_app/android/app
+          sed -i 's/keyAlias = keystoreProperties\["keyAlias"\] as String/keyAlias = keystoreProperties["keyAlias"] as String? ?: ""/' build.gradle.kts
+          sed -i 's/keyPassword = keystoreProperties\["keyPassword"\] as String/keyPassword = keystoreProperties["keyPassword"] as String? ?: ""/' build.gradle.kts
+          sed -i 's/storePassword = keystoreProperties\["storePassword"\] as String/storePassword = keystoreProperties["storePassword"] as String? ?: ""/' build.gradle.kts
 
       - name: Fetch dependencies
         run: |
           cd simple_live_app
           flutter pub get
 
-      - name: Build Release APK（使用--no-sound-null-safety 并禁用签名校验）
+      - name: Build Release APK
         run: |
           cd simple_live_app
-          flutter build apk --release --split-per-abi --android-skip-build-dependency-validation --no-sound-null-safety
-          # 重点：flutter build 增加 --debug 不行，换gradle参数绕过release签名
-          cd android
-          ./gradlew assembleRelease -Pandroid.injected.signing.store.file=""
+          flutter build apk --release --split-per-abi --android-skip-build-dependency-validation
 
       - name: Upload APK artifacts
         uses: actions/upload-artifact@v4
