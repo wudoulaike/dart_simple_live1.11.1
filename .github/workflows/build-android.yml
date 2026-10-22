@@ -18,13 +18,13 @@ jobs:
       - name: Flutter doctor
         run: flutter doctor -v
 
-      - name: 关闭AGP新DSL，同时注释release签名配置，修复null强转崩溃
+      - name: 关闭AGP新DSL + 删除整个release签名块
         run: |
           cd simple_live_app/android
           echo "android.newDsl=false" >> gradle.properties
           echo "android.builtInKotlin=false" >> gradle.properties
-          # 注释 signingConfigs { create("release") { ... } } 整块
-          sed -i '42,50 s/^/#/' app/build.gradle.kts
+          # 删除42~50行 signingConfigs { create("release") ... }
+          sed -i '42,50d' app/build.gradle.kts
           cat app/build.gradle.kts
 
       - name: Fetch dependencies
