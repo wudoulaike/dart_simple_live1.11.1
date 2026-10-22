@@ -18,13 +18,13 @@ jobs:
       - name: Flutter doctor
         run: flutter doctor -v
 
-      - name: 关闭AGP新DSL，注释release里的signingConfig引用
+      - name: 关闭AGP新DSL，注释release signingConfig行
         run: |
           cd simple_live_app/android
           echo "android.newDsl=false" >> gradle.properties
           echo "android.builtInKotlin=false" >> gradle.properties
-          # 注释这一行：signingConfig = signingConfigs.getByName("release")
-          perl -pi 's/^\s*signingConfig = signingConfigs.getByName\("release"\)/        \/\/ signingConfig = signingConfigs.getByName("release")/' app/build.gradle.kts
+          # 找到包含 signingConfig = signingConfigs.getByName("release") 的行，在行首添加 //
+          sed -i 's/\(.*signingConfig = signingConfigs.getByName("release")\)/\/\/ \1/' app/build.gradle.kts
           cat app/build.gradle.kts
 
       - name: Fetch dependencies
