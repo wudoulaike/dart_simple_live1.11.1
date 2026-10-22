@@ -18,7 +18,7 @@ jobs:
       - name: Flutter doctor
         run: flutter doctor -v
 
-      - name: 关闭AGP新DSL，生成临时keystore.properties，注释release签名引用
+      - name: 准备临时keystore配置
         run: |
           cd simple_live_app/android
           echo "android.newDsl=false" >> gradle.properties
@@ -29,7 +29,6 @@ keyPassword=temp123
 storeFile=temp.keystore
 storePassword=temp123
 EOF
-          # 注释引用行
           sed -i 's/\(.*signingConfig = signingConfigs.getByName("release")\)/\/\/ \1/' app/build.gradle.kts
 
       - name: Fetch dependencies
