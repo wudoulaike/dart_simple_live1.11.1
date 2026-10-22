@@ -9,20 +9,23 @@ jobs:
       - name: Checkout source
         uses: actions/checkout@v4
 
-      - name: Setup Flutter 3.32.0 (intl=0.20.2，匹配项目依赖)
+      - name: Setup Flutter 3.47.7
         uses: subosito/flutter-action@v2
         with:
-          flutter-version: '3.32.0'
+          flutter-version: '3.47.7'
           channel: stable
 
       - name: Flutter doctor
         run: flutter doctor -v
 
-      - name: 关闭AGP9新DSL，规避 null cast 报错
+      - name: 关闭AGP新DSL，同时注释release签名配置，修复null强转崩溃
         run: |
           cd simple_live_app/android
           echo "android.newDsl=false" >> gradle.properties
           echo "android.builtInKotlin=false" >> gradle.properties
+          # 注释 signingConfigs { create("release") { ... } } 整块
+          sed -i '42,50 s/^/#/' app/build.gradle.kts
+          cat app/build.gradle.kts
 
       - name: Fetch dependencies
         run: |
