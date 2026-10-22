@@ -1,0 +1,31 @@
+name: Build Windows Only
+on:
+  workflow_dispatch: # ✅ 支持手动点击Run workflow启动
+
+jobs:
+  build-windows:
+    runs-on: windows-latest
+    steps:
+      - name: Checkout source
+        uses: actions/checkout@v4
+
+      - name: Setup Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: '3.22.0'
+          channel: stable
+
+      - name: Flutter Doctor
+        run: flutter doctor
+
+      - name: Get dependencies & Build Windows
+        run: |
+          cd simple_live_app
+          flutter pub get
+          flutter build windows --release
+
+      - name: Upload Windows Release
+        uses: actions/upload-artifact@v4
+        with:
+          name: simple-live-win10
+          path: simple_live_app/build/windows/x64/runner/Release
