@@ -18,23 +18,24 @@ jobs:
       - name: Flutter doctor
         run: flutter doctor -v
 
-      - name: Patch gradle config
+      - name: 关闭新DSL
         run: |
           cd simple_live_app/android
           echo "android.newDsl=false" >> gradle.properties
           echo "android.builtInKotlin=false" >> gradle.properties
-          cd app
-          sed -i -E 's/keystoreProperties\[(".*?")\] as String/keystoreProperties\[\1\]\?:""/g' build.gradle.kts
 
       - name: Fetch dependencies
         run: |
           cd simple_live_app
           flutter pub get
 
-      - name: Build Release APK
+      - name: Build Release APK（使用--no-sound-null-safety 并禁用签名校验）
         run: |
           cd simple_live_app
-          flutter build apk --release --split-per-abi --android-skip-build-dependency-validation
+          flutter build apk --release --split-per-abi --android-skip-build-dependency-validation --no-sound-null-safety
+          # 重点：flutter build 增加 --debug 不行，换gradle参数绕过release签名
+          cd android
+          ./gradlew assembleRelease -Pandroid.injected.signing.store.file=""
 
       - name: Upload APK artifacts
         uses: actions/upload-artifact@v4
