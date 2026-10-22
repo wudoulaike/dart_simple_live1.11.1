@@ -18,12 +18,19 @@ jobs:
       - name: Flutter doctor
         run: flutter doctor -v
 
+      - name: 关闭AGP新DSL & 内置Kotlin，修复空转换报错
+        run: |
+          cd simple_live_app/android
+          echo "android.newDsl=false" >> gradle.properties
+          echo "android.builtInKotlin=false" >> gradle.properties
+          cat gradle.properties
+
       - name: Fetch dependencies
         run: |
           cd simple_live_app
           flutter pub get
 
-      - name: Build Release APK (skip gradle version check)
+      - name: Build Release APK
         run: |
           cd simple_live_app
           flutter build apk --release --split-per-abi --android-skip-build-dependency-validation
@@ -33,3 +40,4 @@ jobs:
         with:
           name: simple-live-android-apk
           path: simple_live_app/build/app/outputs/flutter-apk/
+
