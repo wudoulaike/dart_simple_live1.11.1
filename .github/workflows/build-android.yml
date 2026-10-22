@@ -9,21 +9,14 @@ jobs:
       - name: Checkout source
         uses: actions/checkout@v4
 
-      - name: Setup Flutter
+      - name: Setup Flutter 3.24.5 (适配 dart_simple_live 1.1.1)
         uses: subosito/flutter-action@v2
         with:
-          flutter-version: '3.47.7'
+          flutter-version: '3.24.5'
           channel: stable
 
       - name: Flutter doctor
         run: flutter doctor -v
-
-      - name: 关闭AGP新DSL & 内置Kotlin，修复空转换报错
-        run: |
-          cd simple_live_app/android
-          echo "android.newDsl=false" >> gradle.properties
-          echo "android.builtInKotlin=false" >> gradle.properties
-          cat gradle.properties
 
       - name: Fetch dependencies
         run: |
@@ -33,11 +26,10 @@ jobs:
       - name: Build Release APK
         run: |
           cd simple_live_app
-          flutter build apk --release --split-per-abi --android-skip-build-dependency-validation
+          flutter build apk --release --split-per-abi
 
       - name: Upload APK artifacts
         uses: actions/upload-artifact@v4
         with:
           name: simple-live-android-apk
           path: simple_live_app/build/app/outputs/flutter-apk/
-
