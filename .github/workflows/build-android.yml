@@ -1,4 +1,4 @@
-name: Build Android APK 
+name: Build Android APK
 on:
   workflow_dispatch:
 
@@ -18,18 +18,13 @@ jobs:
       - name: Flutter doctor
         run: flutter doctor -v
 
-      - name: 准备临时keystore配置
+      - name: Patch gradle config
         run: |
           cd simple_live_app/android
           echo "android.newDsl=false" >> gradle.properties
           echo "android.builtInKotlin=false" >> gradle.properties
-          cat > keystore.properties <<'EOF'
-keyAlias=temp
-keyPassword=temp123
-storeFile=temp.keystore
-storePassword=temp123
-EOF
-          sed -i 's/\(.*signingConfig = signingConfigs.getByName("release")\)/\/\/ \1/' app/build.gradle.kts
+          cd app
+          sed -i -E 's/keystoreProperties\[(".*?")\] as String/keystoreProperties\[\1\]\?:""/g' build.gradle.kts
 
       - name: Fetch dependencies
         run: |
